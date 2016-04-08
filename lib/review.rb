@@ -47,21 +47,29 @@ class Review
   end
 
   def review_file
-    scss_lint_config = SCSSLint::Config.new(config_options.to_hash)
-    filename = attributes.fetch(FILENAME)
+    Dir.mktmpdir do |dir|
+      Dir.chdir dir
+      FileUtils.mkdir_p(File.dirname(filename))
+      File.write(filename, content)
+      File.write(".scss-lint.yml", config)
+      regex = /\A
+        (?<path>.+):
+        (?<line_number>\d+)\s+
+        \[(?<violation_level>\w)\]\s+
+        (?<rule_name>\w+):\s+
+        (?<message>.+)
+        \n?
+      \z/ox
+      `scss-lint #{filename}`.each_line.map do |line|
+        match_data = regex.match(line)
 
-    if !scss_lint_config.excluded_file?(filename)
-      scss_lint_runner = SCSSLint::Runner.new(scss_lint_config)
-
-      create_tempfile do |tempfile|
-        scss_lint_runner.run([file: tempfile, path: filename])
-      end
-
-      scss_lint_runner.lints.map do |lint|
-        { line: lint.location.line, message: lint.description }
-      end
-    else
-      DEFAULT_VIOLATIONS
+        if match_data
+          {
+            line: match_data[:line_number].to_i,
+            message: match_data[:message],
+          }
+        end
+      end.compact
     end
   end
 
@@ -84,5 +92,19 @@ class Review
       patch: attributes.fetch(PATCH),
       violations: violations,
     )
+  end
+
+  def filename
+    attributes.fetch(FILENAME)
+  end
+
+  def content
+    attributes.fetch(CONTENT)
+  end
+
+  def config
+    attributes.fetch(CONFIG) do
+      File.read(File.join(File.expand_path("../..", __FILE__), ConfigOptions::DEFAULT_CONFIG_FILE))
+    end
   end
 end
