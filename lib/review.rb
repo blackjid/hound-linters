@@ -48,10 +48,9 @@ class Review
 
   def review_file
     Dir.mktmpdir do |dir|
-      Dir.chdir dir
-      FileUtils.mkdir_p(File.dirname(filename))
-      File.write(filename, content)
-      File.write(".scss-lint.yml", config)
+      FileUtils.mkdir_p(File.join(dir, File.dirname(filename)))
+      File.write(File.join(dir, filename), content)
+      File.write(File.join(dir, ".scss-lint.yml"), config)
       regex = /\A
         (?<path>.+):
         (?<line_number>\d+)\s+
@@ -60,7 +59,8 @@ class Review
         (?<message>.+)
         \n?
       \z/ox
-      `scss-lint #{filename}`.each_line.map do |line|
+      output, _status = Open3.capture2e("scss-lint #{filename}", chdir: dir)
+      output.each_line.map do |line|
         match_data = regex.match(line)
 
         if match_data
@@ -104,7 +104,7 @@ class Review
 
   def config
     attributes.fetch(CONFIG) do
-      File.read(File.join(File.expand_path("../..", __FILE__), ConfigOptions::DEFAULT_CONFIG_FILE))
+      File.read(ConfigOptions::DEFAULT_CONFIG_FILE)
     end
   end
 end
