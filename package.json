@@ -1,0 +1,8 @@
+{
+  "name": "linters",
+  "version": "1.0.0",
+  "description": "Use Node for JS based linters",
+  "dependencies": {
+    "eslint": "^2.12.0"
+  }
+}
