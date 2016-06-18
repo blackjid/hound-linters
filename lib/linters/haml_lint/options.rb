@@ -3,8 +3,8 @@ require "linters/haml_lint/tokenizer"
 module Linters
   module HamlLint
     class Options
-      def command
-        "haml-lint ."
+      def command(filename)
+        "haml-lint #{filename}"
       end
 
       def config_filename

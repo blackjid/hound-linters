@@ -3,9 +3,10 @@ require "linters/eslint/tokenizer"
 module Linters
   module Eslint
     class Options
-      def command
+      def command(filename)
         path = File.join(File.dirname(__FILE__), "../../..")
-        File.join(path, "/node_modules/eslint/bin/eslint.js .")
+        cmd = "/node_modules/eslint/bin/eslint.js #{filename}"
+        File.join(path, cmd)
       end
 
       def config_filename

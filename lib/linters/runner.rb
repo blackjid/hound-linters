@@ -24,7 +24,7 @@ module Linters
 
     def call
       output = Lint.call(
-        command: linter_options.command,
+        command: linter_options.command(filename),
         config_file: config_file,
         source_file: source_file,
       )

@@ -3,8 +3,8 @@ require "linters/scss_lint/tokenizer"
 module Linters
   module ScssLint
     class Options
-      def command
-        "scss-lint"
+      def command(filename)
+        "scss-lint #{filename}"
       end
 
       def config_filename
