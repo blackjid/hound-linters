@@ -14,6 +14,7 @@ This service uses the following linters:
 
   * [scss-lint](https://github.com/brigade/scss-lint) for SCSS
   * [haml-lint](https://github.com/brigade/haml-lint) for HAML
+  * [eslint](http://eslint.org) for JavaScript and JSX
 
 ## Getting Started
 
