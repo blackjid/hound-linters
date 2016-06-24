@@ -1,14 +1,14 @@
-require "yaml"
+require "json"
 
 module Linters
   class Config
     def initialize(content:, default_config_path:)
-      @custom_config = YAML.safe_load(content) || {}
+      @custom_config = JSON.parse("{}") || {}
       @default_config_path = default_config_path
     end
 
     def to_yaml
-      to_hash.to_yaml
+      to_hash.to_json
     end
 
     private
@@ -20,7 +20,7 @@ module Linters
     end
 
     def default_config
-      YAML.safe_load(default_content)
+      JSON.parse(default_content)
     end
 
     def default_content
